@@ -203,10 +203,10 @@ if __name__ == "__main__":
 
     top_nodes = recursive_cluster_and_summarize(initial_nodes, depth=0)
 
-    print("\n📊 Cluster statistics results: ")
+    print("\n Cluster statistics results: ")
     for i, count in enumerate(layer_cluster_counts):
         print(f"Level {i}: {count} clusters")
-    print(f"\n🔚 Total number of clustering levels：{len(layer_cluster_counts)}")
+    print(f"\n Total number of clustering levels：{len(layer_cluster_counts)}")
 
     root_node = TreeNode(depth=-1, text="root")
     for node in top_nodes:
@@ -216,7 +216,7 @@ if __name__ == "__main__":
     with open(os.path.join(SAVE_DIR, CLUSTER_CHUNK_JSON), "w", encoding="utf-8") as f:
         json.dump(root_node.to_dict(), f, ensure_ascii=False, indent=2)
 
-    print("✅ Done!")
+    print("Done!")
 
 
 def build_tree_from_json(data, parent_node=None):
@@ -284,7 +284,7 @@ def create_vector_library_A(data, embedding_model):
                 documents=[chunk_text]
             )
         except Exception as e:
-            print(f"❌ Failed: file_code={file_code}, id={col_name}, chunk_length={len(chunk_text)}")
+            print(f"Failed: file_code={file_code}, id={col_name}, chunk_length={len(chunk_text)}")
             print(f"Information: {e}")
 
             return vector_libraries_A
@@ -317,7 +317,7 @@ def build_layered_vector_libraries(layer_dict, embedding_model, save_name_prefix
                 documents=[node.text],
                 metadatas=[metadata]
             )
-    print("✅ All done!")
+    print("All done!")
 
 
 if __name__ == "__main__":
@@ -338,7 +338,7 @@ if __name__ == "__main__":
     layer_dict, node_id_map = assign_ids_by_layer(root)
     
     build_layered_vector_libraries(layer_dict, embedding_model)
-    print("✅ Vector databases A and B have been successfully created and the old versions cleared!")
+    print("Vector databases A and B have been successfully created and the old versions cleared!")
 
 
 
@@ -364,7 +364,7 @@ def hierarchical_search(query_embedding, max_depth, save_name_prefix="Layer"):
             )
 
         if not result["ids"] or not result["ids"][0]:
-            print(f"❌ depth={depth} no results")
+            print(f"depth={depth} no results")
             return ""
 
         current_id = result["ids"][0][0]
@@ -375,10 +375,10 @@ def hierarchical_search(query_embedding, max_depth, save_name_prefix="Layer"):
                 child_ids = json.loads(node_info["metadatas"][0]["children"])
                 current_ids = child_ids
             except Exception as e:
-                print(f"⚠️ Failed to parse child node: {e}")
+                print(f"Failed to parse child node: {e}")
                 break
         else:
-            print("⚠️ No child node found, exiting early.")
+            print("No child node found, exiting early.")
             break
 
     collection_name = f"{save_name_prefix}{max_depth}"
@@ -416,7 +416,7 @@ for code in filename_to_code.values():
     try:
         vector_libraries_A[code] = chroma.get_collection(name=code)
     except Exception as e:
-        print(f"⚠️ Collection {code} not found in vector database A. Error message: {e}")
+        print(f"Collection {code} not found in vector database A. Error message: {e}")
 
 with open(os.path.join(SAVE_DIR, CLUSTER_CHUNK_JSON), "r", encoding="utf-8") as f:
     tree_data = json.load(f)
@@ -432,9 +432,9 @@ for depth in sorted(layer_dict.keys()):
     collection_name = f"Layer{depth}"
     try:
         vector_libraries_B[depth] = chroma.get_collection(name=collection_name)
-        print(f"✅ Successfully loaded {collection_name}")
+        print(f"Successfully loaded {collection_name}")
     except Exception as e:
-        print(f"⚠️ Collection {collection_name} not found in vector database A. Error message: {e}")
+        print(f" Collection {collection_name} not found in vector database A. Error message: {e}")
 
 
 count_A = 0 
@@ -443,7 +443,7 @@ count_B = 0
 model_use_stats = {model: {"A": 0, "B": 0} for model in model_list}
 
 for model_name in model_list:
-    print(f"\n🚀 当前模型：{model_name}")
+    print(f"\n Current Model：{model_name}")
 
     for idx, row in tqdm(df_qa.iterrows(), total=len(df_qa)):
         qid = row["number"]
@@ -477,7 +477,7 @@ for model_name in model_list:
                     model_use_stats[model_name]["A"] += 1
                     used_library = "A"
                 except:
-                    print(f"⚠️ Failed to query vector database A, switched to vector database B: 《{file_name}》")
+                    print(f"Failed to query vector database A, switched to vector database B: 《{file_name}》")
                     context = hierarchical_search(query_embedding, max(layer_dict.keys()))
                     count_B += 1
                     model_use_stats[model_name]["B"] += 1
@@ -486,7 +486,7 @@ for model_name in model_list:
                 context = hierarchical_search(query_embedding, max(layer_dict.keys()))
                 count_B += 1
                 model_use_stats[model_name]["B"] += 1
-                print(f"⚠️ The corresponding file name or ID was not found in vector database A: 《{file_name}》, using vector database B instead")
+                print(f"The corresponding file name or ID was not found in vector database A: 《{file_name}》, using vector database B instead")
                 used_library = "B"
         else:
             context = hierarchical_search(query_embedding, max(layer_dict.keys()))
@@ -512,7 +512,6 @@ Requirements:
 (2) {'For multiple-choice questions, the answer should be in the format like ACD, without commas or spaces, letters in alphabetical order, no duplicates, and at most 5 letters.' if is_multiple_choice else 'For single-choice questions, the answer should be only one letter: A/B/C/D.'}.
 """
 
-        # === 调用模型 ===
         try:
             response = ""
             stream = ollama.generate(model=model_name, prompt=model_prompt, stream=True, options={"temperature": 0})
@@ -525,15 +524,14 @@ Requirements:
             print(f"Model {model_name} failed to answer question {qid}: {e}")
             df_qa.at[idx, model_name] = "ERROR"
 
-print(f"\n📊 Vector database usage statistics (total): vector database A: {count_A} times, vector database B: {count_B} times")
+print(f"\nVector database usage statistics (total): vector database A: {count_A} times, vector database B: {count_B} times")
 
-print("\n📊 Number of times each model used vector database A/B：")
+print("\nNumber of times each model used vector database A/B：")
 for model_name in model_list:
     a_used = model_use_stats[model_name]["A"]
     b_used = model_use_stats[model_name]["B"]
     print(f"{model_name}：vector database A = {a_used}，vector database B = {b_used}")
 
-# %%
 print("\n=== Overall Accuracy of Each Model ===")
 for model_name in model_list:
     correct = (df_qa[model_name] == df_qa["answer"]).sum()
@@ -542,7 +540,7 @@ for model_name in model_list:
 
 print("\n=== Accuracy of Each Model by Question Type ===")
 for model_name in model_list:
-    print(f"\nLLM: {model_name}")
+    print(f"\n LLM: {model_name}")
     for qtype in df_qa["type"].unique():
         sub_df = df_qa[df_qa["type"] == qtype]
         correct = (sub_df[model_name] == sub_df["answer"]).sum()
@@ -561,7 +559,7 @@ for model_name in model_list:
 
 QA_output_path = "output_folder/Answer Results.xlsx"
 df_qa.to_excel(QA_output_path, index=False)
-print(f"\n✅ Answer results saved to: {QA_output_path}")
+print(f"\n Answer results saved to: {QA_output_path}")
 
 
 
