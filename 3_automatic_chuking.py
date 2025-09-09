@@ -31,7 +31,7 @@ def cosine_similarity(vec1, vec2):
 def split_and_cluster_chunks(units: list, threshold: float = 0.9,
                               min_chunk_size: int = 1, max_chunk_size: int = 10):
 
-    print("⚙️ Embedding generation in progress for text chunks...")
+    print("Embedding generation in progress for text chunks...")
     
     embeddings_list = [get_embedding(unit) for unit in tqdm(units)]
 
@@ -49,7 +49,7 @@ def split_and_cluster_chunks(units: list, threshold: float = 0.9,
     if current_chunk:
         chunks.append(' '.join(current_chunk).strip())
 
-    print(f"✅ A total of {len(chunks)} results have been generated.")
+    print(f"A total of {len(chunks)} results have been generated.")
     return chunks
 
 file_path = "knowledge_unit.xlsx"
@@ -75,7 +75,7 @@ for filename, units in file_units_dict.items():
 df_chunks = pd.DataFrame(chunk_records)
 chunk_output_path = "output_folder/automatic_chunk_for_cluster.xlsx"
 df_chunks.to_excel(chunk_output_path, index=False)
-print(f"📄 Results have been saved in {chunk_output_path}")
+print(f"Results have been saved in {chunk_output_path}")
 
 
 
